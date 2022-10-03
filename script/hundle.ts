@@ -2,9 +2,8 @@ import fs from 'fs/promises'
 import path from 'path'
 import xml2js from 'xml2js'
 import pinyin from 'pinyin'
-import { title } from 'process'
 
-type Return = {
+export type Return = {
   [key: string]: ReturnAni[]
 }
 
@@ -12,6 +11,7 @@ type ReturnAni = {
   name: string
   type: string
   lang: string
+  alias?: string[]
 }
 
 type ParsedResult = {
@@ -46,37 +46,32 @@ fs.readFile(path.resolve('./anime-titles.xml'), { encoding: 'utf-8' })
       for (let ani of res.animetitles.anime) {
         const retAni: ReturnAni[] = []
         for (let titles of ani.title) {
+          if (titles.$['xml:lang'].startsWith('zh')) {
+            // Add Pinyin
+            retAni.push({
+              name: titles._,
+              type: titles.$.type,
+              lang: titles.$['xml:lang'],
+              alias: [
+                pinyin(titles._, { style: 'normal' }).flat().join(''),
+                pinyin(titles._, { style: 'normal' }).flat().join(' '),
+                pinyin(titles._, { style: 'normal' }).flat().map(v => v[0]).join(''),
+              ]
+            })
+            continue
+          }
+
           retAni.push({
             name: titles._,
             type: titles.$.type,
             lang: titles.$['xml:lang'],
           })
-          if (titles.$['xml:lang'].startsWith('zh')) {
-            // Add Pinyin
-            retAni.push({
-              name: pinyin(titles._, { style: 'normal' }).flat().join(''),
-              type: 'pinyin',
-              lang: titles.$['xml:lang'],
-            })
-
-            retAni.push({
-              name: pinyin(titles._, { style: 'normal' }).flat().join(' '),
-              type: 'pinyin-space',
-              lang: titles.$['xml:lang'],
-            })
-
-            retAni.push({
-              name: pinyin(titles._, { style: 'normal' }).flat().map(v => v[0]).join(''),
-              type: 'pinyin-initial',
-              lang: titles.$['xml:lang'],
-            })
-          }
         }
 
         ret[ani.$.aid] = retAni
       }
 
-      fs.writeFile(path.resolve('./anime-titles.json'), JSON.stringify(ret, undefined, 2))
+      fs.writeFile(path.resolve('./data/anime-titles.ts'), `import type { Return } from '../script/hundle';export default ${JSON.stringify(ret)} as Return;`)
         .then(() => {
           console.log('Convert successfully.')
         }).catch(err => {
