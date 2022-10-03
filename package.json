@@ -1,0 +1,23 @@
+{
+  "name": "anidb-search",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx ./script/hundle.ts",
+    "dev": "tsx watch ./script/hundle.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "16",
+    "@types/xml2js": "^0.4.11",
+    "tsx": "^3.9.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "pinyin": "3.0.0-alpha.4",
+    "xml2js": "^0.4.23"
+  }
+}
