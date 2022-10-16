@@ -33,6 +33,7 @@ type TitleAttr = {
   'xml:lang': string
 }
 
+// <root>/anime-titles.xml
 fs.readFile(path.resolve('./anime-titles.xml'), { encoding: 'utf-8' })
   .then(data => {
     xml2js.parseString(data, (err, res: ParsedResult) => {
