@@ -6,10 +6,10 @@ type SearchResult = {
 }
 
 export default async (request: VercelRequest, response: VercelResponse) => {
-  const { lang, content } = request.query
+  const { lang = '', content } = request.query
 
   if (typeof lang !== 'string' || typeof content !== 'string') {
-    response.status(400)
+    response.status(400).send('Fail to check paramters.')
     return
   }
 
